@@ -110,7 +110,7 @@ graph TD
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/GeoScope.git
+git clone https://github.com/Coderbhai777/GeoScope.git
 cd GeoScope
 ```
 
