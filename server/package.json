@@ -1,0 +1,15 @@
+{
+  "name": "geoscope-server",
+  "version": "1.0.0",
+  "description": "GeoScope Backend Ingestion & Real-Time Gateway",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test-pipeline.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "cors": "^2.8.5",
+    "satellite.js": "^5.0.0"
+  }
+}
