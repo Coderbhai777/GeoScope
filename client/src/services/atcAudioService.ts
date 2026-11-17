@@ -205,7 +205,8 @@ class AtcAudioService {
 
     if (this.audioEl) {
       try {
-        const streamUrl = getAtcAudioStreamUrl(station.id);
+        const streamUrl = station.localAudioUrl || getAtcAudioStreamUrl(station.id);
+        this.audioEl.loop = true;
         this.audioEl.src = streamUrl;
         if (this.state.isPlaying) {
           if (this.audioCtx && this.audioCtx.state === 'suspended') {
@@ -234,8 +235,10 @@ class AtcAudioService {
 
     if (this.audioEl && this.state.currentStation) {
       try {
+        const targetUrl = this.state.currentStation.localAudioUrl || getAtcAudioStreamUrl(this.state.currentStation.id);
+        this.audioEl.loop = true;
         if (!this.audioEl.src || this.audioEl.src === window.location.href) {
-          this.audioEl.src = getAtcAudioStreamUrl(this.state.currentStation.id);
+          this.audioEl.src = targetUrl;
         }
         await this.audioEl.play();
       } catch (e) {

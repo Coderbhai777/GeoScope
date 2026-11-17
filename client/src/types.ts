@@ -96,6 +96,7 @@ export interface AtcStation {
   channelType: string;
   description: string;
   streamUrl: string;
+  localAudioUrl?: string;
   distanceKm?: number;
 }
 

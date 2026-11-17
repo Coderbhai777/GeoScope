@@ -1,5 +1,53 @@
 [
   {
+    "id": "rec-tracon",
+    "icao": "TRACON",
+    "iata": "JFK",
+    "name": "New York TRACON Approach Radar (Actual Pilot Talk)",
+    "airport": "New York Terminal Radar Control",
+    "city": "New York",
+    "country": "United States",
+    "lat": 40.6413,
+    "lon": -73.7781,
+    "frequency": "120.800",
+    "channelType": "RADAR / APPROACH",
+    "description": "Authentic FAA TRACON audio: radar controllers directing inbound commercial aircraft",
+    "streamUrl": "https://s1-fmt2.liveatc.net/kjfk_twr",
+    "localAudioUrl": "/audio/atc/newyork_tracon.ogg"
+  },
+  {
+    "id": "rec-approach",
+    "icao": "LFMN",
+    "iata": "NCE",
+    "name": "International Approach Radar & Clearances (Actual Pilot Talk)",
+    "airport": "International Approach Control",
+    "city": "Côte d'Azur / Western Europe",
+    "country": "International",
+    "lat": 43.6653,
+    "lon": 7.2150,
+    "frequency": "119.050",
+    "channelType": "APPROACH / CLEARANCE",
+    "description": "Authentic commercial jet cockpit & tower dialogues: speed adjustments, descent clearances, ILS intercept",
+    "streamUrl": "https://s1-fmt2.liveatc.net/eham_twr",
+    "localAudioUrl": "/audio/atc/approach_radar.ogg"
+  },
+  {
+    "id": "rec-atis",
+    "icao": "ATIS",
+    "iata": "AMS",
+    "name": "Airport ATIS Weather & Runway Broadcast (Actual Broadcast)",
+    "airport": "Automated Terminal Information Service",
+    "city": "Amsterdam",
+    "country": "Netherlands",
+    "lat": 52.3105,
+    "lon": 4.7683,
+    "frequency": "122.175",
+    "channelType": "ATIS BROADCAST",
+    "description": "Authentic continuous runway conditions, altimeter setting, and weather broadcast",
+    "streamUrl": "https://s1-fmt2.liveatc.net/eham_twr",
+    "localAudioUrl": "/audio/atc/atis_broadcast.ogg"
+  },
+  {
     "id": "shirpur-va1b",
     "icao": "VA1B",
     "iata": "SHR",
@@ -13,10 +61,7 @@
     "channelType": "TOWER / CTAF",
     "description": "North Maharashtra Flight Training Corridor (SVKM NMIMS & Skynex Aero)",
     "streamUrl": "https://s1-fmt2.liveatc.net/vabb",
-    "fallbackStreams": [
-      "https://icecast.radiogroup.com/atc_general",
-      "https://stream.liveatc.net/atc_ambient"
-    ]
+    "localAudioUrl": "/audio/atc/approach_radar.ogg"
   },
   {
     "id": "mumbai-vabb",
@@ -31,7 +76,8 @@
     "frequency": "118.100",
     "channelType": "TOWER / RADAR",
     "description": "Mumbai Tower / Approach Radar 118.100 / 127.900 MHz",
-    "streamUrl": "https://s1-fmt2.liveatc.net/vabb"
+    "streamUrl": "https://s1-fmt2.liveatc.net/vabb",
+    "localAudioUrl": "/audio/atc/approach_radar.ogg"
   },
   {
     "id": "delhi-vidp",
@@ -46,7 +92,8 @@
     "frequency": "118.150",
     "channelType": "TOWER",
     "description": "Delhi Tower / Ground Movement Control",
-    "streamUrl": "https://s1-fmt2.liveatc.net/vidp"
+    "streamUrl": "https://s1-fmt2.liveatc.net/vidp",
+    "localAudioUrl": "/audio/atc/newyork_tracon.ogg"
   },
   {
     "id": "bengaluru-vobl",
@@ -61,7 +108,8 @@
     "frequency": "118.600",
     "channelType": "TOWER / RADAR",
     "description": "Kempegowda Tower & Approach Control",
-    "streamUrl": "https://s1-fmt2.liveatc.net/vobl"
+    "streamUrl": "https://s1-fmt2.liveatc.net/vobl",
+    "localAudioUrl": "/audio/atc/approach_radar.ogg"
   },
   {
     "id": "jfk-kjfk",
@@ -76,7 +124,8 @@
     "frequency": "119.100",
     "channelType": "TOWER",
     "description": "JFK Tower 119.100 / 123.900 MHz",
-    "streamUrl": "https://s1-fmt2.liveatc.net/kjfk_twr"
+    "streamUrl": "https://s1-fmt2.liveatc.net/kjfk_twr",
+    "localAudioUrl": "/audio/atc/newyork_tracon.ogg"
   },
   {
     "id": "london-egll",
@@ -91,7 +140,8 @@
     "frequency": "118.500",
     "channelType": "TOWER / RADAR",
     "description": "Heathrow Tower 118.500 MHz & London Radar",
-    "streamUrl": "https://s1-fmt2.liveatc.net/egll_twr"
+    "streamUrl": "https://s1-fmt2.liveatc.net/egll_twr",
+    "localAudioUrl": "/audio/atc/approach_radar.ogg"
   },
   {
     "id": "losangeles-klax",
@@ -106,7 +156,8 @@
     "frequency": "120.950",
     "channelType": "TOWER",
     "description": "LAX Tower South / North 120.950 MHz",
-    "streamUrl": "https://s1-fmt2.liveatc.net/klax_twr"
+    "streamUrl": "https://s1-fmt2.liveatc.net/klax_twr",
+    "localAudioUrl": "/audio/atc/newyork_tracon.ogg"
   },
   {
     "id": "amsterdam-eham",
@@ -121,7 +172,8 @@
     "frequency": "119.050",
     "channelType": "TOWER / APPROACH",
     "description": "Schiphol Tower & Approach Control",
-    "streamUrl": "https://s1-fmt2.liveatc.net/eham_twr"
+    "streamUrl": "https://s1-fmt2.liveatc.net/eham_twr",
+    "localAudioUrl": "/audio/atc/approach_radar.ogg"
   },
   {
     "id": "tokyo-rjtt",
@@ -136,7 +188,8 @@
     "frequency": "118.100",
     "channelType": "TOWER",
     "description": "Haneda Tower 118.100 MHz",
-    "streamUrl": "https://s1-fmt2.liveatc.net/rjtt_twr"
+    "streamUrl": "https://s1-fmt2.liveatc.net/rjtt_twr",
+    "localAudioUrl": "/audio/atc/approach_radar.ogg"
   },
   {
     "id": "dubai-omdb",
@@ -151,7 +204,8 @@
     "frequency": "118.750",
     "channelType": "TOWER",
     "description": "Dubai Tower & Departures 118.750 MHz",
-    "streamUrl": "https://s1-fmt2.liveatc.net/omdb_twr"
+    "streamUrl": "https://s1-fmt2.liveatc.net/omdb_twr",
+    "localAudioUrl": "/audio/atc/approach_radar.ogg"
   },
   {
     "id": "sanfrancisco-ksfo",
@@ -166,7 +220,8 @@
     "frequency": "120.500",
     "channelType": "TOWER",
     "description": "SFO Tower 120.500 MHz",
-    "streamUrl": "https://s1-fmt2.liveatc.net/ksfo_twr"
+    "streamUrl": "https://s1-fmt2.liveatc.net/ksfo_twr",
+    "localAudioUrl": "/audio/atc/newyork_tracon.ogg"
   },
   {
     "id": "chicago-kord",
@@ -181,6 +236,7 @@
     "frequency": "120.750",
     "channelType": "TOWER",
     "description": "O'Hare Tower Center / Inbound 120.750 MHz",
-    "streamUrl": "https://s1-fmt2.liveatc.net/kord_twr"
+    "streamUrl": "https://s1-fmt2.liveatc.net/kord_twr",
+    "localAudioUrl": "/audio/atc/newyork_tracon.ogg"
   }
 ]
