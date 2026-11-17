@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import type { Flight, PilotViewMode } from '../types';
+import type { Flight, PilotViewMode, AtcStation } from '../types';
 import { 
   X, 
   Eye, 
@@ -11,8 +11,13 @@ import {
   Radio, 
   ShieldCheck, 
   Plane,
-  RotateCcw
+  RotateCcw,
+  Volume2,
+  VolumeX,
+  ChevronDown
 } from 'lucide-react';
+import { atcAudio } from '../services/atcAudioService';
+import { fetchAtcStations } from '../services/api';
 
 interface CockpitHudOverlayProps {
   flight: Flight;
@@ -37,6 +42,28 @@ export const CockpitHudOverlay: React.FC<CockpitHudOverlayProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onExit]);
+
+  const [atcState, setAtcState] = useState(atcAudio.getState());
+  const [allStations, setAllStations] = useState<AtcStation[]>([]);
+  const [showStationMenu, setShowStationMenu] = useState(false);
+
+  useEffect(() => {
+    const unsub = atcAudio.subscribe((st) => setAtcState(st));
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    fetchAtcStations().then(res => {
+      if (res && res.stations) setAllStations(res.stations);
+    }).catch(console.warn);
+  }, []);
+
+  // Update nearest ATC station tracking as the aircraft flies
+  useEffect(() => {
+    if (flight && flight.lat !== undefined && flight.lon !== undefined) {
+      atcAudio.updateAircraftPosition(flight.lat, flight.lon);
+    }
+  }, [flight.lat, flight.lon]);
 
   const heading = Math.round(flight.heading || 0);
   const altM = Math.round(flight.altitude || 0);
@@ -268,6 +295,153 @@ export const CockpitHudOverlay: React.FC<CockpitHudOverlayProps> = ({
             <span>EXIT PILOT VIEW</span>
             <span className="text-[9px] opacity-75 font-normal px-1 py-0.2 bg-black/40 rounded">ESC</span>
           </button>
+        </div>
+      </div>
+
+      {/* Top-Right: Avionics VHF COM1 Live ATC Radio Panel */}
+      <div className="absolute top-4 right-4 pointer-events-auto z-40 select-none">
+        <div className="bg-space-950/90 backdrop-blur-xl border border-cyan-500/50 rounded-2xl p-3 shadow-2xl shadow-cyan-950/60 w-80 text-xs font-mono">
+          {/* Header & RX status */}
+          <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-2">
+            <div className="flex items-center space-x-2">
+              <Radio className="w-4 h-4 text-cyan-400" />
+              <span className="font-bold text-white tracking-widest">COM1 VHF RADIO</span>
+            </div>
+            
+            <div className="flex items-center space-x-1.5">
+              <span className={`w-2 h-2 rounded-full ${
+                atcState.isPlaying 
+                  ? (atcState.isReceiving ? 'bg-emerald-400 animate-ping' : 'bg-emerald-400')
+                  : 'bg-gray-600'
+              }`} />
+              <span className={`text-[10px] font-bold ${
+                atcState.isPlaying ? 'text-emerald-300' : 'text-gray-400'
+              }`}>
+                {atcState.isPlaying ? (atcState.isReceiving ? 'RX RECEIVING' : 'RX ON AIR') : 'STANDBY'}
+              </span>
+            </div>
+          </div>
+
+          {/* Digital Frequency Readout */}
+          <div className="bg-space-900/90 border border-cyan-500/40 rounded-xl p-2.5 mb-2.5 flex items-center justify-between">
+            <div>
+              <div className="text-[10px] text-gray-400 uppercase tracking-wider">Active Frequency</div>
+              <div className="text-xl font-bold text-cyan-300 tracking-wider">
+                {atcState.currentStation?.frequency || '118.100'} <span className="text-xs text-gray-400">MHz</span>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-[10px] text-gray-400 uppercase">Tower ICAO</div>
+              <div className="text-sm font-bold text-yellow-400">
+                {atcState.currentStation?.icao || 'AUTO'}
+              </div>
+            </div>
+          </div>
+
+          {/* Current Station Info */}
+          <div className="mb-2.5 px-1">
+            <div className="text-white font-bold truncate">
+              {atcState.currentStation?.name || 'Searching Nearest ATC Tower...'}
+            </div>
+            <div className="text-[10px] text-gray-400 flex items-center justify-between mt-0.5">
+              <span>{atcState.currentStation?.channelType || 'TOWER / RADAR'}</span>
+              {atcState.currentStation?.distanceKm !== undefined && (
+                <span className="text-cyan-400 font-semibold">{atcState.currentStation.distanceKm} km away</span>
+              )}
+            </div>
+          </div>
+
+          {/* Audio Play/Pause & Volume Controls */}
+          <div className="flex items-center space-x-2 pt-1 border-t border-white/10">
+            <button
+              onClick={() => atcAudio.togglePlay()}
+              className={`flex-1 py-1.5 px-3 rounded-xl font-bold flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
+                atcState.isPlaying
+                  ? 'bg-red-500/20 text-red-300 border border-red-500/40 hover:bg-red-500/30'
+                  : 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-lg shadow-cyan-950'
+              }`}
+            >
+              {atcState.isPlaying ? (
+                <>
+                  <VolumeX className="w-3.5 h-3.5" />
+                  <span>MUTE RADIO</span>
+                </>
+              ) : (
+                <>
+                  <Volume2 className="w-3.5 h-3.5" />
+                  <span>LISTEN LIVE ATC</span>
+                </>
+              )}
+            </button>
+
+            {/* Auto-Tune Toggle */}
+            <button
+              onClick={() => atcAudio.setAutoTune(!atcState.isAutoTune)}
+              title="Automatically tune to nearest airport tower"
+              className={`py-1.5 px-2.5 rounded-xl border text-[11px] font-bold transition-colors cursor-pointer ${
+                atcState.isAutoTune
+                  ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300'
+                  : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+              }`}
+            >
+              AUTO
+            </button>
+
+            {/* Station Selector Dropdown Button */}
+            <div className="relative">
+              <button
+                onClick={() => setShowStationMenu(prev => !prev)}
+                title="Select ATC airport tower manually"
+                className="py-1.5 px-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-gray-300 hover:text-white transition-colors cursor-pointer"
+              >
+                <ChevronDown className="w-3.5 h-3.5" />
+              </button>
+
+              {showStationMenu && (
+                <div className="absolute right-0 top-9 bg-space-950/95 backdrop-blur-xl border border-cyan-500/40 rounded-xl p-1.5 shadow-2xl min-w-[240px] max-h-64 overflow-y-auto z-50 flex flex-col space-y-1">
+                  <div className="text-[10px] text-gray-400 font-bold px-2 py-1 uppercase tracking-wider border-b border-white/10">
+                    Worldwide ATC Towers
+                  </div>
+                  {allStations.map(st => (
+                    <button
+                      key={st.id}
+                      onClick={() => {
+                        atcAudio.setAutoTune(false);
+                        atcAudio.tuneStation(st);
+                        setShowStationMenu(false);
+                      }}
+                      className={`px-2.5 py-1.5 rounded-lg flex items-center justify-between text-left text-[11px] transition-colors cursor-pointer ${
+                        atcState.currentStation?.id === st.id
+                          ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/40'
+                          : 'text-gray-300 hover:bg-white/5'
+                      }`}
+                    >
+                      <div className="truncate mr-2">
+                        <div className="font-semibold text-white">{st.icao} • {st.city}</div>
+                        <div className="text-[10px] text-gray-400 truncate">{st.name}</div>
+                      </div>
+                      <span className="text-yellow-400 font-mono text-[10px] shrink-0">{st.frequency}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Volume Slider Bar */}
+          <div className="flex items-center space-x-2 mt-2 px-1 text-[10px] text-gray-400">
+            <span>VOL</span>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value={atcState.volume}
+              onChange={(e) => atcAudio.setVolume(parseFloat(e.target.value))}
+              className="w-full accent-cyan-400 cursor-pointer h-1 bg-white/20 rounded"
+            />
+            <span className="w-8 text-right font-mono">{Math.round(atcState.volume * 100)}%</span>
+          </div>
         </div>
       </div>
     </div>

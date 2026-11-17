@@ -23,6 +23,12 @@ const {
 } = require('./aviation/fleet-registry');
 const { ingestAllProviders, getProviderDiagnostics } = require('./aviation/providers/provider-manager');
 const { recordFlightBreadcrumb, getFlightTrail, getDetailedFlightTrail } = require('./aviation/flight-trails');
+const { 
+  getAllStations, 
+  getStationById, 
+  findNearestStation, 
+  proxyAtcStream 
+} = require('./aviation/atc/atc-manager');
 
 const app = express();
 const PORT = process.env.PORT || 5050;
@@ -598,6 +604,34 @@ app.get('/api/weather', async (req, res) => {
   const weather = await fetchWeatherAtPoint(lat, lon);
   if (!weather) return res.status(502).json({ error: 'Weather lookup failed' });
   res.json({ success: true, weather });
+});
+
+/**
+ * LIVE ATC AUDIO INTEGRATION
+ * Real-time Air Traffic Control tower audio, regional radio frequencies,
+ * and nearest airport auto-tuning.
+ */
+app.get('/api/atc/stations', (req, res) => {
+  res.json({
+    success: true,
+    count: getAllStations().length,
+    stations: getAllStations()
+  });
+});
+
+app.get('/api/atc/nearest', (req, res) => {
+  const lat = parseFloat(req.query.lat);
+  const lon = parseFloat(req.query.lon);
+  if (isNaN(lat) || isNaN(lon)) {
+    return res.json({ success: true, station: getAllStations()[0] });
+  }
+  const nearest = findNearestStation(lat, lon);
+  res.json({ success: true, station: nearest });
+});
+
+app.get('/api/atc/stream', (req, res) => {
+  const stationId = req.query.station || req.query.id || 'shirpur-va1b';
+  proxyAtcStream(stationId, req, res);
 });
 
 // Pre-seed

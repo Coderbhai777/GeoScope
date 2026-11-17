@@ -26,9 +26,13 @@ import {
   MapPin,
   CheckCircle2,
   Info,
-  Eye
+  Eye,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
-import { fetchPointWeather } from '../services/api';
+import { fetchPointWeather, fetchNearestAtcStation } from '../services/api';
+import { atcAudio } from '../services/atcAudioService';
+import type { AtcStation } from '../types';
 
 interface DetailDrawerProps {
   selectedEntity: SelectedEntity;
@@ -45,6 +49,25 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({
 }) => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loadingWeather, setLoadingWeather] = useState(false);
+  const [nearestAtc, setNearestAtc] = useState<AtcStation | null>(null);
+  const [isAtcPlaying, setIsAtcPlaying] = useState(atcAudio.getState().isPlaying);
+
+  useEffect(() => {
+    const unsub = atcAudio.subscribe(st => setIsAtcPlaying(st.isPlaying));
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    if (selectedEntity && selectedEntity.type === 'flight') {
+      fetchNearestAtcStation(selectedEntity.data.lat, selectedEntity.data.lon)
+        .then(res => {
+          if (res && res.station) setNearestAtc(res.station);
+        })
+        .catch(() => {});
+    } else {
+      setNearestAtc(null);
+    }
+  }, [selectedEntity]);
 
   useEffect(() => {
     if (!selectedEntity) {
@@ -156,6 +179,34 @@ export const DetailDrawer: React.FC<DetailDrawerProps> = ({
                 <Eye className="w-4 h-4 animate-pulse" />
                 <span>PILOT'S VIEW (COCKPIT CAM)</span>
               </button>
+            )}
+
+            {/* Live ATC Radio Quick Tune */}
+            {nearestAtc && (
+              <div className="bg-space-900/90 p-2.5 rounded-xl border border-cyan-500/30 flex items-center justify-between shadow-lg">
+                <div className="flex items-center space-x-2">
+                  <Radio className="w-4 h-4 text-cyan-400 shrink-0" />
+                  <div className="truncate mr-2">
+                    <div className="text-[10px] text-gray-400 font-mono">ATC TOWER • {nearestAtc.icao}</div>
+                    <div className="text-xs font-bold text-white font-mono truncate">{nearestAtc.name}</div>
+                    <div className="text-[10px] text-cyan-400 font-mono">{nearestAtc.frequency} MHz {nearestAtc.distanceKm !== undefined ? `(${nearestAtc.distanceKm} km)` : ''}</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    atcAudio.tuneStation(nearestAtc);
+                    atcAudio.togglePlay();
+                  }}
+                  className={`py-1.5 px-3 rounded-lg font-mono text-xs font-bold flex items-center space-x-1 transition-all shrink-0 cursor-pointer ${
+                    isAtcPlaying
+                      ? 'bg-red-500/20 text-red-300 border border-red-500/40 hover:bg-red-500/30'
+                      : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/30'
+                  }`}
+                >
+                  {isAtcPlaying ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                  <span>{isAtcPlaying ? 'MUTE' : 'LISTEN'}</span>
+                </button>
+              </div>
             )}
 
             <div className="bg-space-900/80 p-3 rounded border border-white/5 space-y-2">

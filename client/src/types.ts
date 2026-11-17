@@ -82,6 +82,23 @@ export interface AviationProviderReport {
   disclosure?: string;
 }
 
+export interface AtcStation {
+  id: string;
+  icao: string;
+  iata: string;
+  name: string;
+  airport: string;
+  city: string;
+  country: string;
+  lat: number;
+  lon: number;
+  frequency: string;
+  channelType: string;
+  description: string;
+  streamUrl: string;
+  distanceKm?: number;
+}
+
 // Legacy aliases for backward compatibility
 export type NmimsAircraftMetadata = NorthMaharashtraAircraft;
 export type NmimsFleetLiveTelemetry = NonNullable<NorthMaharashtraAircraft['live']>;

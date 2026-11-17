@@ -1,3 +1,5 @@
+import type { AtcStation } from '../types';
+
 const API_BASE = 'http://localhost:5050/api';
 
 export async function getGatewayStatus() {
@@ -57,4 +59,20 @@ export async function fetchPointWeather(lat: number, lon: number) {
   const res = await fetch(`${API_BASE}/weather?lat=${lat}&lon=${lon}`);
   if (!res.ok) throw new Error(`Weather API error: ${res.status}`);
   return res.json();
+}
+
+export async function fetchAtcStations(): Promise<{ success: boolean; count: number; stations: AtcStation[] }> {
+  const res = await fetch(`${API_BASE}/atc/stations`);
+  if (!res.ok) throw new Error(`ATC Stations API error: ${res.status}`);
+  return res.json();
+}
+
+export async function fetchNearestAtcStation(lat: number, lon: number): Promise<{ success: boolean; station: AtcStation }> {
+  const res = await fetch(`${API_BASE}/atc/nearest?lat=${lat}&lon=${lon}`);
+  if (!res.ok) throw new Error(`Nearest ATC Station API error: ${res.status}`);
+  return res.json();
+}
+
+export function getAtcAudioStreamUrl(stationId: string): string {
+  return `${API_BASE}/atc/stream?station=${encodeURIComponent(stationId)}`;
 }
